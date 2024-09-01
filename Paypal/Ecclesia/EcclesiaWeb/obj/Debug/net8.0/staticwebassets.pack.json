@@ -1,0 +1,313 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\EcclesiaWeb.bundle.scp.css",
+      "PackagePath": "staticwebassets\\EcclesiaWeb.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\field.jpg",
+      "PackagePath": "staticwebassets\\images\\field.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\product\\7b22df9f-3cca-43a7-b9f3-befecd21fd3b.jpg",
+      "PackagePath": "staticwebassets\\images\\product\\7b22df9f-3cca-43a7-b9f3-befecd21fd3b.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\product\\81f95016-92ec-427d-b0e5-bdadb63b7e10.jpg",
+      "PackagePath": "staticwebassets\\images\\product\\81f95016-92ec-427d-b0e5-bdadb63b7e10.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\product\\8a1d9d64-f7bb-408b-9283-422801ce3e5c.jpg",
+      "PackagePath": "staticwebassets\\images\\product\\8a1d9d64-f7bb-408b-9283-422801ce3e5c.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\product\\9a2cd159-67d9-4e3e-9b17-d7fe6c09363e.jpg",
+      "PackagePath": "staticwebassets\\images\\product\\9a2cd159-67d9-4e3e-9b17-d7fe6c09363e.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\product\\b83c6e96-0df4-47b4-928b-3d8b3603625a.jpg",
+      "PackagePath": "staticwebassets\\images\\product\\b83c6e96-0df4-47b4-928b-3d8b3603625a.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\product\\d54c627b-db43-4d4d-b549-12450b5a4ac2.jpg",
+      "PackagePath": "staticwebassets\\images\\product\\d54c627b-db43-4d4d-b549-12450b5a4ac2.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\product\\e3ffe112-d75c-484b-965a-d1732f1868a7.webp",
+      "PackagePath": "staticwebassets\\images\\product\\e3ffe112-d75c-484b-965a-d1732f1868a7.webp"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\river.jpg",
+      "PackagePath": "staticwebassets\\images\\river.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\images\\sea.jpg",
+      "PackagePath": "staticwebassets\\images\\sea.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\js\\order.js",
+      "PackagePath": "staticwebassets\\js\\order.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\js\\product.js",
+      "PackagePath": "staticwebassets\\js\\product.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\LICENSE",
+      "PackagePath": "staticwebassets\\lib\\bootstrap"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery-validation-unobtrusive\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery-validation\\LICENSE.md",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\LICENSE.md"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.min.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.min.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.js"
+    },
+    {
+      "Id": "C:\\Users\\Jorda\\OneDrive\\Documents\\MVC\\N\\Paypal\\Ecclesia\\EcclesiaWeb\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.EcclesiaWeb.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.EcclesiaWeb.props",
+      "PackagePath": "build\\EcclesiaWeb.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.EcclesiaWeb.props",
+      "PackagePath": "buildMultiTargeting\\EcclesiaWeb.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.EcclesiaWeb.props",
+      "PackagePath": "buildTransitive\\EcclesiaWeb.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

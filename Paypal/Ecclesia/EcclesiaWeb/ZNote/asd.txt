@@ -1,0 +1,74 @@
+﻿Persnoal US:
+sb-uk4ja32340810@personal.example.com
+kJ2H$?D#
+
+
+
+Busnines us:
+sb-7xun632273637@business.example.com
+$w@E*RB4
+
+client:
+AUWE4HYdiP9svUkB5y4RgpwDPH5qUghNPSnZ-l6I6k15Es9JWLyyb3pqC96JBXggrm0lxwgI4jRUGrFY
+secrect:
+AUWE4HYdiP9svUkB5y4RgpwDPH5qUghNPSnZ-l6I6k15Es9JWLyyb3pqC96JBXggrm0lxwgI4jRUGrFY
+
+
+
+
+
+
+
+private async Task<string> GetPaypalAccessToken()
+        {
+
+            _logger.LogInformation("Attempting to get PayPal access token.");
+            string accessToken = "";
+            string url = _paypalUrl + "/v1/oauth2/token";
+
+            using (var client = new HttpClient())
+            {
+                string credentials = $"{_paypalClientId}:{_paypalSecret}";
+                byte[] credentialsBytes = Encoding.UTF8.GetBytes(credentials);
+                string credentials64 = Convert.ToBase64String(credentialsBytes);
+                client.DefaultRequestHeaders.Add("Authorization", "Basic " + credentials64);
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+                requestMessage.Content = new StringContent("grant_type=client_credentials", Encoding.UTF8, "application/x-www-form-urlencoded");
+
+                var httpResponse = await client.SendAsync(requestMessage);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var strResponse = await httpResponse.Content.ReadAsStringAsync();
+
+                    var jsonResponse = JsonNode.Parse(strResponse);
+                    if (jsonResponse != null)
+                    {
+                        accessToken = jsonResponse["access_token"]?.ToString() ?? "";
+                    }
+                }
+            }
+
+            return accessToken;
+        }
+
+
+
+
+
+
+
+        sb-7xun632273637@business.example.com
+
+
+        $w@E*RB4
+
+
+
+
+        sb-7pgcz32340057@personal.example.com
+
+
+
+        Lf&ZOS2Q

@@ -1,0 +1,259 @@
+﻿using Ecclesia.DataAccess.Repository.IRepository;
+using Ecclesia.Models;
+using Ecclesia.Models.ViewModels;
+using Ecclesia.Utility;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PayPal;
+using PayPal.Api;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json.Nodes;
+
+namespace EcclesiaWeb.Areas.Customer.Controllers
+{
+    [Area("Customer")]
+    [Authorize]
+    public class CartController : Controller
+    {
+        
+
+       
+        
+        private readonly IUnitOfWork _unitOfWork;
+        [BindProperty]
+        public ShoppingCartVM ShoppingCartVM { get; set; }
+        public CartController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public IActionResult Index()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM = new ShoppingCartVM
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product"),
+                OrderHeader = new OrderHeader()
+            };
+
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.ShoppingCartList.Sum(cart => cart.Product.ListPrice);
+            return View(ShoppingCartVM);
+        }
+
+        public IActionResult Summary()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM = new ShoppingCartVM
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product") ?? new List<ShoppingCart>(),
+                OrderHeader = new OrderHeader()
+            };
+
+            ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
+
+            if (ShoppingCartVM.OrderHeader.ApplicationUser != null)
+            {
+                ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
+                ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
+                ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.ApplicationUser.StreetAddress;
+                ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.ApplicationUser.City;
+                ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
+                ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
+            }
+
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.ShoppingCartList.Sum(cart => cart.Product.ListPrice);
+            return View(ShoppingCartVM);
+        }
+
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPOST()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM.ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product");
+
+            ShoppingCartVM.OrderHeader.OrderDate = DateTime.Now;
+            ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
+
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.ShoppingCartList.Sum(cart => cart.Product.ListPrice);
+
+            ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+            ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+
+            _unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
+            _unitOfWork.Save();
+
+            foreach (var cart in ShoppingCartVM.ShoppingCartList)
+            {
+                OrderDetail orderDetail = new()
+                {
+                    ProductId = cart.ProductId,
+                    OrderHeaderId = ShoppingCartVM.OrderHeader.Id,
+                    Price = cart.Product.ListPrice,
+                };
+                _unitOfWork.OrderDetail.Add(orderDetail);
+                _unitOfWork.Save();
+            }
+
+            try
+            {
+                // PayPal integration
+                var apiContext = new APIContext(new OAuthTokenCredential(SD.PayPalClientId, SD.PayPalClientSecret).GetAccessToken())
+                {
+                    Config = new Dictionary<string, string>
+                    {
+                        { "mode", "sandbox" } // Or "live" for production
+                    }
+                };
+
+                var payer = new Payer() { payment_method = "paypal" };
+
+                var redirectUrls = new RedirectUrls()
+                {
+                    cancel_url = "https://localhost:7288/customer/cart/index",
+                    return_url = "https://localhost:7288/customer/cart/OrderConfirmation?id=" + ShoppingCartVM.OrderHeader.Id
+                };
+
+                var itemList = new ItemList() { items = new List<Item>() };
+
+                foreach (var item in ShoppingCartVM.ShoppingCartList)
+                {
+                    itemList.items.Add(new Item()
+                    {
+                        name = item.Product.Title,
+                        currency = "ZAR",
+                        price = item.Product.ListPrice.ToString("F2"),
+                        quantity = "1",
+                        sku = "sku"
+                    });
+                }
+
+                var details = new Details()
+                {
+                    tax = "0",
+                    shipping = "0",
+                    subtotal = ShoppingCartVM.OrderHeader.OrderTotal.ToString("F2")
+                };
+
+                var amount = new Amount()
+                {
+                    currency = "ZAR",
+                    total = (decimal.Parse(details.subtotal) + decimal.Parse(details.tax) + decimal.Parse(details.shipping)).ToString("F2"),
+                    details = details
+                };
+
+                var transactionList = new List<Transaction>
+                {
+                    new Transaction()
+                    {
+                        description = "Transaction description",
+                        invoice_number = Guid.NewGuid().ToString(),
+                        amount = amount,
+                        item_list = itemList
+                    }
+                };
+
+                var payment = new Payment()
+                {
+                    intent = "sale",
+                    payer = payer,
+                    transactions = transactionList,
+                    redirect_urls = redirectUrls
+                };
+
+                var createdPayment = payment.Create(apiContext);
+
+                var links = createdPayment.links.GetEnumerator();
+                string paypalRedirectUrl = null;
+
+                while (links.MoveNext())
+                {
+                    PayPal.Api.Links link = links.Current;
+                    if (link.rel.ToLower().Trim().Equals("approval_url"))
+                    {
+                        paypalRedirectUrl = link.href;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(paypalRedirectUrl))
+                {
+                    throw new Exception("Could not find PayPal approval URL.");
+                }
+
+                // Update the OrderHeader with the PayPal payment ID
+                _unitOfWork.OrderHeader.UpdatePaypalPaymentID(ShoppingCartVM.OrderHeader.Id, createdPayment.id, null);
+                _unitOfWork.Save();
+
+                Response.Headers.Add("Location", paypalRedirectUrl);
+                return new StatusCodeResult(303);
+            }
+            catch (PayPalException ex)
+            {
+                // Log the error and provide feedback
+                TempData["ErrorMessage"] = $"An error occurred during the PayPal payment process: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                // Log unexpected errors
+                TempData["ErrorMessage"] = $"An unexpected error occurred: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        public IActionResult OrderConfirmation(int id)
+        {
+            var orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser");
+            var apiContext = new APIContext(new OAuthTokenCredential(SD.PayPalClientId, SD.PayPalClientSecret).GetAccessToken());
+
+            var paymentId = Request.Query["paymentId"].ToString();
+            var payerId = Request.Query["PayerID"].ToString();
+
+            var paymentExecution = new PaymentExecution() { payer_id = payerId };
+            var payment = new Payment() { id = paymentId };
+
+            var executedPayment = payment.Execute(apiContext, paymentExecution);
+
+            if (executedPayment.state.ToLower() != "approved")
+            {
+                orderHeader.PaymentStatus = SD.PaymentStatusRejected;
+                orderHeader.OrderStatus = SD.StatusCancelled;
+            }
+            else
+            {
+                _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+            }
+
+            _unitOfWork.Save();
+
+            HttpContext.Session.Clear();
+            return View(id);
+        }
+
+        public IActionResult Remove(int cartId)
+        {
+            var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.Id == cartId, tracked: true);
+            if (cartFromDb == null)
+            {
+                TempData["ErrorMessage"] = "Item not found in the cart.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _unitOfWork.ShoppingCart.Remove(cartFromDb);
+            _unitOfWork.Save();
+
+            HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count());
+            TempData["SuccessMessage"] = "Item removed successfully.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+    }
+}

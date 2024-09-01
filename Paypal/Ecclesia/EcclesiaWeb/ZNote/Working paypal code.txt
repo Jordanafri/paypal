@@ -1,0 +1,498 @@
+﻿SD:
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Ecclesia.Utility
+{
+    public static class SD
+    {
+        public const string Role_Admin = "Admin";
+        public const string Role_Employee = "Employee";
+        public const string Role_Customer = "Customer";
+
+
+        public const string StatusPending = "Pending";
+        public const string StatusApproved = "Approved";
+        public const string StatusInProcess = "Processing";
+        public const string StatusShipped = "Shipped";
+        public const string StatusCancelled = "Cancelled";
+        public const string StatusRefunded = "Refunded";
+
+        public const string PaymentStatusPending = "Pending";
+        public const string PaymentStatusApproved = "Approved";
+        public const string PaymentStatusDelayedPayement = "ApprovedForDelayedPayment";
+        public const string PaymentStatusRejected = "Rejected";
+
+        public const string SessionCart = "SessionShoppingCart";
+
+
+        public const string PaymentMethodPayPal = "PayPal";
+
+        // PayPal settings
+        public static string PayPalClientId { get; set; }
+        public static string PayPalClientSecret { get; set; }
+        public static string PayPalMode { get; set; }
+    }
+}
+-------------------------------------------------------------------------
+Paypalclient.cs:
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Ecclesia.Utility
+{
+    public class PayPalClient
+    {
+        private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
+
+        public PayPalClient(HttpClient httpClient, IConfiguration configuration)
+        {
+            _httpClient = httpClient;
+            _configuration = configuration;
+        }
+
+        public async Task<string> GetAccessTokenAsync()
+        {
+            var clientId = _configuration["PayPal:ClientId"];
+            var clientSecret = _configuration["PayPal:ClientSecret"];
+            var baseUrl = _configuration["PayPal:BaseUrl"];
+
+            var authToken = Encoding.ASCII.GetBytes($"{clientId}:{clientSecret}");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
+
+            var content = new StringContent("grant_type=client_credentials", Encoding.UTF8, "application/x-www-form-urlencoded");
+            var response = await _httpClient.PostAsync($"{baseUrl}/v1/oauth2/token", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error (e.g., log the error, throw an exception, etc.)
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Failed to retrieve PayPal access token. Status Code: {response.StatusCode}. Error: {errorContent}");
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<PayPalAccessTokenResponse>(json);
+
+            return result.access_token;
+        }
+
+        public async Task<HttpResponseMessage> MakeAuthorizedRequestAsync(HttpMethod method, string endpoint, HttpContent content = null)
+        {
+            var accessToken = await GetAccessTokenAsync();
+
+            var request = new HttpRequestMessage(method, endpoint);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            if (content != null)
+            {
+                request.Content = content;
+            }
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Request to PayPal API failed. Status Code: {response.StatusCode}. Error: {errorContent}");
+            }
+
+            return response;
+        }
+    }
+
+    public class PayPalAccessTokenResponse
+    {
+        public string scope { get; set; }
+        public string access_token { get; set; }
+        public string token_type { get; set; }
+        public string app_id { get; set; }
+        public int expires_in { get; set; }
+        public string nonce { get; set; }
+    }
+}
+-------------------------------------------------------------------------
+appsettings.json:
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=LAPTOP-R28D1D67\\SQLEXPRESS;Database=EcclesiaArt;Trusted_Connection=True;TrustServerCertificate=True"
+  },
+  "PayPal": {
+    "ClientId": "AUWE4HYdiP9svUkB5y4RgpwDPH5qUghNPSnZ-l6I6k15Es9JWLyyb3pqC96JBXggrm0lxwgI4jRUGrFY",
+    "ClientSecret": "EPHM4oG6WECBlh39omwvs7dMcQiNaGFHexkRI2_BAEN8IdH2rP9MgSB8XfEGaKa3FOZHN5zCjHbsdQ9V",
+    "BaseUrl": "https://api-m.sandbox.paypal.com",
+    "Mode": "sandbox" // Change to "live" for production
+  }
+
+}
+-----------------------------------------------------------------------------------------------
+cartcontroller:
+using Ecclesia.DataAccess.Repository.IRepository;
+using Ecclesia.Models;
+using Ecclesia.Models.ViewModels;
+using Ecclesia.Utility;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Text.Json;
+using System.Text;
+using System.Threading.Tasks;
+using System.Globalization;
+using PayPal.Api;
+using PayPal;
+
+namespace EcclesiaWeb.Areas.Customer.Controllers
+{
+    [Area("Customer")]
+    [Authorize]
+    public class CartController : Controller
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly PayPalClient _payPalClient;
+
+        [BindProperty]
+        public ShoppingCartVM ShoppingCartVM { get; set; }
+
+        public CartController(IUnitOfWork unitOfWork, PayPalClient payPalClient)
+        {
+            _unitOfWork = unitOfWork;
+            _payPalClient = payPalClient;
+        }
+
+        public IActionResult Index()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM = new ShoppingCartVM
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product"),
+                OrderHeader = new OrderHeader()
+            };
+
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.ShoppingCartList.Sum(cart => cart.Product.ListPrice);
+            return View(ShoppingCartVM);
+        }
+
+        public IActionResult Summary()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM = new ShoppingCartVM
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product") ?? new List<ShoppingCart>(),
+                OrderHeader = new OrderHeader()
+            };
+
+            ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
+
+            if (ShoppingCartVM.OrderHeader.ApplicationUser != null)
+            {
+                ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
+                ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
+                ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.ApplicationUser.StreetAddress;
+                ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.ApplicationUser.City;
+                ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
+                ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
+            }
+
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.ShoppingCartList.Sum(cart => cart.Product.ListPrice);
+            return View(ShoppingCartVM);
+        }
+
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPOST()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM.ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product");
+
+            ShoppingCartVM.OrderHeader.OrderDate = DateTime.Now;
+            ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
+
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.ShoppingCartList.Sum(cart => cart.Product.ListPrice);
+
+            ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+            ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+
+            _unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
+            _unitOfWork.Save();
+
+            try
+            {
+                // PayPal integration
+                var payer = new Payer() { payment_method = "paypal" };
+
+                var redirectUrls = new RedirectUrls()
+                {
+                    cancel_url = "https://localhost:7288/customer/cart/index",
+                    return_url = "https://localhost:7288/customer/cart/OrderConfirmation?id=" + ShoppingCartVM.OrderHeader.Id
+                };
+
+                var itemList = new ItemList() { items = new List<Item>() };
+
+                foreach (var item in ShoppingCartVM.ShoppingCartList)
+                {
+                    itemList.items.Add(new Item()
+                    {
+                        name = item.Product.Title,
+                        currency = "USD",
+                        price = item.Product.ListPrice.ToString("F2", CultureInfo.InvariantCulture),
+                        quantity = "1",
+                        sku = "sku"
+                    });
+                }
+
+                var details = new Details()
+                {
+                    tax = "0.00",
+                    shipping = "0.00",
+                    subtotal = ShoppingCartVM.OrderHeader.OrderTotal.ToString("F2", CultureInfo.InvariantCulture)
+                };
+
+                var amount = new Amount()
+                {
+                    currency = "USD",
+                    total = (decimal.Parse(details.subtotal, CultureInfo.InvariantCulture) +
+                             decimal.Parse(details.tax, CultureInfo.InvariantCulture) +
+                             decimal.Parse(details.shipping, CultureInfo.InvariantCulture)).ToString("F2", CultureInfo.InvariantCulture),
+                    details = details
+                };
+
+                var transactionList = new List<Transaction>
+        {
+            new Transaction()
+            {
+                description = "Transaction description",
+                invoice_number = Guid.NewGuid().ToString(),
+                amount = amount,
+                item_list = itemList
+            }
+        };
+
+                var payment = new Payment()
+                {
+                    intent = "sale",
+                    payer = payer,
+                    transactions = transactionList,
+                    redirect_urls = redirectUrls
+                };
+
+                // Synchronous payment creation
+                var apiContext = new APIContext(new OAuthTokenCredential(SD.PayPalClientId, SD.PayPalClientSecret).GetAccessToken())
+                {
+                    Config = new Dictionary<string, string>
+            {
+                { "mode", "sandbox" } // Or "live" for production
+            }
+                };
+                var createdPayment = payment.Create(apiContext);
+
+                var approvalUrl = createdPayment.links.FirstOrDefault(link => link.rel == "approval_url")?.href;
+                if (string.IsNullOrEmpty(approvalUrl))
+                {
+                    throw new Exception("Could not find PayPal approval URL.");
+                }
+
+                // Update the OrderHeader with the PayPal payment ID
+                _unitOfWork.OrderHeader.UpdatePaypalPaymentID(ShoppingCartVM.OrderHeader.Id, createdPayment.id, null);
+                _unitOfWork.Save();
+
+                return Redirect(approvalUrl);
+            }
+            catch (PayPalException ex)
+            {
+                // Log the error and provide feedback
+                TempData["ErrorMessage"] = $"An error occurred during the PayPal payment process: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                // Log unexpected errors
+                TempData["ErrorMessage"] = $"An unexpected error occurred: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+
+
+        public async Task<IActionResult> OrderConfirmation(int id)
+        {
+            var orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser");
+
+            var paymentId = Request.Query["paymentId"].ToString();
+            var payerId = Request.Query["PayerID"].ToString();
+
+            var executePaymentData = new
+            {
+                payer_id = payerId
+            };
+
+            try
+            {
+                var response = await _payPalClient.MakeAuthorizedRequestAsync(HttpMethod.Post, $"https://api.sandbox.paypal.com/v1/payments/payment/{paymentId}/execute", new StringContent(JsonSerializer.Serialize(executePaymentData), Encoding.UTF8, "application/json"));
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                var executedPayment = JsonSerializer.Deserialize<PayPalPaymentResponse>(responseContent);
+
+                if (executedPayment.state.ToLower() != "approved")
+                {
+                    orderHeader.PaymentStatus = SD.PaymentStatusRejected;
+                    orderHeader.OrderStatus = SD.StatusCancelled;
+                }
+                else
+                {
+                    _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+                }
+
+                _unitOfWork.Save();
+
+                HttpContext.Session.Clear();
+                return View(id);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred during the PayPal payment confirmation process: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        public IActionResult Remove(int cartId)
+        {
+            var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.Id == cartId, tracked: true);
+            if (cartFromDb == null)
+            {
+                TempData["ErrorMessage"] = "Item not found in the cart.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _unitOfWork.ShoppingCart.Remove(cartFromDb);
+            _unitOfWork.Save();
+
+            HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count());
+            TempData["SuccessMessage"] = "Item removed successfully.";
+
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    public class PayPalPaymentResponse
+    {
+        public string id { get; set; }
+        public string state { get; set; }
+        public List<PayPalLinkDescription> links { get; set; }
+    }
+
+    public class PayPalLinkDescription
+    {
+        public string href { get; set; }
+        public string rel { get; set; }
+        public string method { get; set; }
+    }
+}
+-----------------------------------------------------------------------------
+program.cs:
+using Ecclesia.DataAccess.Data;
+using Ecclesia.DataAccess.Repository;
+using Ecclesia.DataAccess.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Ecclesia.Utility;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Ecclesia.DataAccess.DbInitializer;
+using Ecclesia.Models;
+using System.Configuration;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Load PayPal settings into the SD class
+SD.PayPalClientId = builder.Configuration["PayPal:ClientId"];
+SD.PayPalClientSecret = builder.Configuration["PayPal:ClientSecret"];
+// Set the PayPal mode (sandbox or live)
+SD.PayPalMode = builder.Configuration["PayPal:Mode"] ?? "sandbox"; // Default to sandbox if not set
+
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = $"/Identity/Account/Login";
+    options.LogoutPath = $"/Identity/Account/Logout";
+    options.AccessDeniedPath = $"/Identity/Account/AccessDeniedPath";
+});
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(100);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddRazorPages();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+// Register the PayPalClient with HttpClient
+builder.Services.AddHttpClient<PayPalClient>();
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseSession();
+
+SeedDatabase();
+
+app.MapRazorPages();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}
+--------------------------------------------------------------------------------------------

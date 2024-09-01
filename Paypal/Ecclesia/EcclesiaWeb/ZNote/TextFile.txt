@@ -1,0 +1,125 @@
+﻿using Ecclesia.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PayPalCheckoutSdk.Orders;
+using Microsoft.Extensions.Logging;
+
+namespace EcclesiaWeb.Areas.Customer.Controllers
+{
+    [Area("Customer")]
+    [Authorize]
+    public class PaymentController : Controller
+    {
+        private readonly IConfiguration _configuration;
+        private readonly PayPalClient _payPalClient;
+        private readonly ILogger<PaymentController> _logger;
+
+        public PaymentController(IConfiguration configuration, PayPalClient payPalClient, ILogger<PaymentController> logger)
+        {
+            _configuration = configuration;
+            _payPalClient = payPalClient;
+            _logger = logger;
+        }
+
+        public IActionResult Index()
+        {
+            ViewBag.ClientId = _configuration["PayPal:ClientId"];
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateOrder([FromBody] CartDto cart)
+        {
+            _logger.LogInformation("CreateOrder method started.");
+
+            try
+            {
+                var request = new OrdersCreateRequest();
+                request.Prefer("return=representation");
+                request.RequestBody(BuildRequestBody(cart));
+
+                var response = await _payPalClient.Client.Execute(request);
+                var order = response.Result<Order>();
+
+                _logger.LogInformation($"Order created successfully. PayPal Order ID: {order.Id}");
+
+                return Json(new { id = order.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating PayPal order.");
+                return StatusCode(500, "An error occurred while creating the order.");
+            }
+        }
+
+        private OrderRequest BuildRequestBody(CartDto cart)
+        {
+            // You can calculate the amount dynamically here based on the cart data
+            var totalAmount = CalculateTotalAmount(cart);
+
+            return new OrderRequest
+            {
+                CheckoutPaymentIntent = "CAPTURE",
+                PurchaseUnits = new List<PurchaseUnitRequest>
+                {
+                    new PurchaseUnitRequest
+                    {
+                        AmountWithBreakdown = new AmountWithBreakdown
+                        {
+                            CurrencyCode = "USD",
+                            Value = totalAmount.ToString("F2") // Ensure correct formatting
+                        }
+                    }
+                }
+            };
+        }
+
+        private decimal CalculateTotalAmount(CartDto cart)
+        {
+            // Implement your calculation logic based on the cart details (e.g., item price * quantity)
+            return cart.Quantity * 100.00m; // Replace 100.00 with your dynamic pricing logic
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CaptureOrder([FromBody] CaptureOrderDto captureOrderDto)
+        {
+            _logger.LogInformation($"Capturing payment for Order ID: {captureOrderDto.OrderID}");
+
+            try
+            {
+                var request = new OrdersCaptureRequest(captureOrderDto.OrderID);
+                request.RequestBody(new OrderActionRequest());
+
+                var response = await _payPalClient.Client.Execute(request);
+                var result = response.Result<Order>();
+
+                if (result.Status == "COMPLETED")
+                {
+                    _logger.LogInformation("Payment captured successfully.");
+                    // Optionally, save transaction details to your database here
+                    return Json(new { success = true, message = "Payment captured successfully." });
+                }
+
+                _logger.LogWarning("Payment capture was not successful.");
+                return Json(new { success = false, message = "Payment capture failed." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error capturing PayPal payment.");
+                return StatusCode(500, "An error occurred while capturing the payment.");
+            }
+        }
+    }
+
+    // DTO classes
+    public class CaptureOrderDto
+    {
+        public string OrderID { get; set; }
+    }
+
+    public class CartDto
+    {
+        public string Sku { get; set; }
+        public int Quantity { get; set; }
+    }
+}
