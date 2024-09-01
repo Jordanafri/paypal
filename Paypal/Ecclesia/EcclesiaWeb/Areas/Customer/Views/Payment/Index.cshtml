@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = "PayPal Integration";
+}
+
+<h2>Pay with PayPal</h2>
+
+<div id="paypal-button-container"></div>
+
+<script src="https://www.paypal.com/sdk/js?client-id=@ViewBag.ClientId&currency=USD"></script>
+
+<script>
+    paypal.Buttons({
+        // Create the order
+        createOrder: async function (data, actions) {
+            try {
+                const response = await fetch('/Customer/Payment/CreateOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sku: "YOUR_PRODUCT_SKU", // Update to dynamic SKU if needed
+                        quantity: 1
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error creating order. Please try again.');
+                }
+
+                const order = await response.json();
+                return order.id;
+            } catch (error) {
+                console.error('Error during order creation:', error);
+                alert('An error occurred while creating the order. Please try again later.');
+            }
+        },
+
+        // Capture the payment on approval
+        onApprove: async function (data) {
+            try {
+                const response = await fetch('/Customer/Payment/CaptureOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderID: data.orderID
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error capturing payment. Please try again.');
+                }
+
+                const details = await response.json();
+
+                if (details.status === 'COMPLETED') {
+                    alert(`Transaction completed successfully! Thank you, ${details.payer.name.given_name}.`);
+                } else {
+                    alert('Payment was not successful. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error capturing payment:', error);
+                alert('An error occurred while capturing the payment. Please try again later.');
+            }
+        },
+
+        // Handle payment cancellation
+        onCancel: function (data) {
+            alert('Payment was cancelled.');
+        },
+
+        // Handle payment errors
+        onError: function (error) {
+            console.error('PayPal payment error:', error);
+            alert('An error occurred during the payment process. Please try again.');
+        }
+    }).render('#paypal-button-container');
+</script>

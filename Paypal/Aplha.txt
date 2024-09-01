@@ -1,0 +1,280 @@
+Aplha:
+Index:
+@{
+}
+
+
+<script src="https://www.paypal.com/sdk/js?client-id=@(ViewBag.PaypalClientId)&currency=ZAR"></script>
+
+<div class="mx-auto p-4 rounded border shadow" style="width: 420px;">
+    <h2 class="text-center mb-5">Complete your Order</h2>
+    <div class="form-group mb-3">
+        <label class="form-label">Total Amount (ZAR)</label>
+        <input class="form-control" type="number" id="totalAmount" step="0.01" placeholder="Enter amount" />
+    </div>
+    <div id="notification-container"></div>
+    <div id="paypal-button-container"></div>
+</div>
+<script>
+    paypal.Buttons({
+        async createOrder() {
+            const response = await fetch("@Url.ActionLink("CreateOrder", "Checkout")", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    amount: document.getElementById("totalAmount").value
+                })
+            });
+
+            const order = await response.json();
+
+            return order.id;
+        },
+        async onApprove(data) {
+            // Capture the funds from the transaction.
+            const response = await fetch("@Url.ActionLink("CompleteOrder", "Checkout")", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    orderID: data.orderID
+                })
+            })
+
+            const details = await response.json();
+            if (details == "success") {
+                document.getElementById("notification-container").innerHTML =
+                    `<div class='alert alert-success alert-dismissible fade show' role='alert'>
+                            <strong> Payment succesfully </strong>
+                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                         </div>
+                        `;
+            }
+            else {
+                document.getElementById("notification-container").innerHTML =
+                    `<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                            <strong> Failed to create Payment! </strong>
+                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                         </div>
+                        `;
+            }
+           
+        },
+        onCancel(data) {
+            document.getElementById("notification-container").innerHTML =
+                `<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                        <strong> Payment Canceled! </strong>
+                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                     </div>
+                    `;
+
+        },
+        onError(err) {
+            document.getElementById("notification-container").innerHTML =
+                `<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                        <strong> an error occured! </strong>
+                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                     </div>
+                    `;
+
+        }
+
+    }).render('#paypal-button-container');
+</script>
+
+
+
+Controller:
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Nodes;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+
+namespace EcclesiaWeb.Areas.Customer.Controllers
+{
+    [Area("Customer")]
+    [Authorize]
+    public class CheckoutController : Controller
+    {
+        private string PaypalClientId { get; set; } = "";
+        private string PaypalSecret { get; set; } = "";
+        private string PaypalUrl { get; set; } = "";
+
+        public CheckoutController(IConfiguration configuration)
+        {
+            PaypalClientId = configuration["PayPal:ClientId"]!;
+            PaypalSecret = configuration["PayPal:Secret"]!;
+            PaypalUrl = configuration["PayPal:Url"]!;
+        }
+
+        public IActionResult Index()
+        {
+            ViewBag.PaypalClientId = PaypalClientId;
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> CreateOrder([FromBody] JsonObject data)
+        {
+            var totalAmount = data?["amount"]?.ToString();
+            if (totalAmount == null)
+            {
+                return new JsonResult(new { Id = "" });
+            }
+
+            //create the request body
+            JsonObject createOrderRequest = new JsonObject();
+            createOrderRequest.Add("intent", "CAPTURE");
+
+            JsonObject amount = new JsonObject();
+            amount.Add("currency_code", "ZAR");
+            amount.Add("value", totalAmount);
+
+            JsonObject purchaseUnit1 = new JsonObject();
+            purchaseUnit1.Add("amount", amount);
+
+            JsonArray purchaseUnits = new JsonArray();
+            purchaseUnits.Add(purchaseUnit1);
+
+            createOrderRequest.Add("purchase_units", purchaseUnits);
+
+            // get access token
+            string accessToken = await GetPaypalAccessToken();
+
+            //send request
+            string url = PaypalUrl + "/v2/checkout/orders";
+
+            //create http client
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+                requestMessage.Content = new StringContent(createOrderRequest.ToString(), null, "application/json");
+
+                var httpResponse = await client.SendAsync(requestMessage);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var strResponse = await httpResponse.Content.ReadAsStringAsync();
+                    var jsonResponse = JsonNode.Parse(strResponse);
+
+                    if (jsonResponse != null)
+                    {
+                        string paypalOrderId = jsonResponse["id"]?.ToString() ?? "";
+
+                        // return a valid PayPal order object
+                        return new JsonResult(new { Id = paypalOrderId });
+                    }
+                }
+            }
+
+            
+            return new JsonResult(new { Id = "" });
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> CompleteOrder([FromBody] JsonObject data)
+        {
+            var orderId = data?["orderID"]?.ToString();
+            if (orderId == null)
+            {
+                return new JsonResult("error");
+
+            }
+
+            //get access token
+            string accessToken = await GetPaypalAccessToken();
+
+
+            //send request 22:20
+            string url = PaypalUrl + "/v2/checkout/orders/" + orderId + "/capture";
+
+            //http client
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+                requestMessage.Content = new StringContent("", null, "application/json");
+
+                var httpResponse = await client.SendAsync(requestMessage);
+
+                //recieve response
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var strResponse = await httpResponse.Content.ReadAsStringAsync();
+                    var jsonResponse = JsonNode.Parse(strResponse);
+
+                    if (jsonResponse != null)
+                    {
+                        string paypalOrderStatus = jsonResponse["status"]?.ToString() ?? "";
+                        if (paypalOrderStatus == "COMPLETED")
+                        {
+                            // save the order in the database
+
+                            return new JsonResult("success");
+                        }
+                    }
+                }
+            }
+
+            return new JsonResult("error");
+        }
+
+
+        private async Task<string> GetPaypalAccessToken()
+        {
+            
+                string accessToken = "";
+                string url = PaypalUrl + "/v1/oauth2/token";
+
+                using (var client = new HttpClient())
+                {
+                    string credentials64 = 
+                        Convert.ToBase64String(Encoding.UTF8.GetBytes(PaypalClientId + ":" + PaypalSecret));
+                    client.DefaultRequestHeaders.Add("Authorization", "Basic " + credentials64);
+
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+                    requestMessage.Content = new StringContent("grant_type=client_credentials", null
+                        , "application/x-www-form-urlencoded");
+
+                    var httpResponse = await client.SendAsync(requestMessage);
+
+                    if (httpResponse.IsSuccessStatusCode)
+                    {
+                        var strResponse = await httpResponse.Content.ReadAsStringAsync();
+
+                        var jsonResponse = JsonNode.Parse(strResponse);
+                        if (jsonResponse != null)
+                        {
+                            accessToken = jsonResponse["access_token"]?.ToString() ?? "";
+                        }
+                    }
+                    //else
+                    //{
+                    //    // Log the error details
+                    //    Console.WriteLine($"Error: {httpResponse.StatusCode} - {httpResponse.ReasonPhrase}");
+                    //}
+                
+                
+                }
+
+            return accessToken;
+        }
+
+
+        
+
+       
+
+    }
+}
+
+
+

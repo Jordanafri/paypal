@@ -1,0 +1,93 @@
+﻿@model ShoppingCart
+
+<form method="post">
+    <input hidden asp-for="ProductId" />
+    <div class="card shadow border-0 mt-4 mb-4">
+        <div class="card-header bg-secondary bg-gradient text-light py-4">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h3 class="text-dark text-uppercase">@Model.Product.Title</h3>
+                    <p class="text-black-50 fw-semibold mb-0">By Elisha</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="py-3">
+                <div class="row d-flex align-content-lg-end">
+                    <div class="col-6 col-md-2 offset-lg-11 pb-0">
+                        <a asp-action="Index" class="btn btn-outline-primary bg-gradient mb-5 fw-semibold btn-sm text-uppercase">
+                            <small>Back</small>
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-4 offset-lg-1 text-center mb-3">
+                        <h3 class="text-dark text-uppercase">@Model.Product.Title</h3>
+                        <img src="@Model.Product.ImageUrl" width="100%" class="rounded" id="productImage" style="cursor:pointer;" />
+                    </div>
+                    <div class="col-12 col-lg-6 offset-lg-1">
+                        <div class="col-12 col col-md-6 pb-4">
+                            <span class="badge text-dark">@Model.Product.Category.Name</span>
+                        </div>
+                        <div class="row ps-2">
+                            <h6 class="text-dark text-opacity-50">ISBN : @Model.Product.ISBN</h6>
+                        </div>
+                        <div class="row ps-2">
+                            <h6 class="text-dark text-opacity-50">Price : <span class="">@Model.Product.ListPrice.ToString("c")</span></h6>
+                        </div>
+                        <div class="row p-lg-2 my-3">
+                            <p class="text-secondary lh-sm">@Html.Raw(Model.Product.Description)</p>
+                        </div>
+                        @* <div class="row p-lg-2 mb-3">
+                            <div class="col-md-4">
+                                <div class="input-group mb-3">
+                                    <input type="number" name="name" value="1" class="form" />
+                                </div>
+                            </div>
+                        </div> *@
+                        <div class="row">
+                            <div class="col-12 col-md-6 pb-1">
+                                <button type="submit" class="btn btn-primary w-100 py-2 text-uppercase fw-semibold">Add To Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="@Model.Product.ImageUrl" class="img-fluid" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('productImage').addEventListener('click', function () {
+        var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        imageModal.show();
+    });
+</script>
+
+<style>
+    .modal-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .modal-body img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+</style>
